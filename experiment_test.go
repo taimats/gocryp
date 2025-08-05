@@ -1,6 +1,10 @@
 package gocrypt_test
 
-import "testing"
+import (
+	"bytes"
+	"crypto/subtle"
+	"testing"
+)
 
 func BenchmarkEfficientPow(b *testing.B) {
 	b.ReportAllocs()
@@ -67,5 +71,40 @@ func TestNoEffPow(t *testing.T) {
 	got := nonEffPow(3, 10)
 	if got != want {
 		t.Errorf("NoEffPow: Not equal:\n(got=%d, want=%d)\n", got, want)
+	}
+}
+
+func BenchmarkEqualBytes(b *testing.B) {
+	b.ReportAllocs()
+	s := "Hello, test function!"
+	want := "Hello, test function!"
+
+	b.ResetTimer()
+	for range b.N {
+		_ = bytes.Equal([]byte(s), []byte(want))
+	}
+}
+
+func BenchmarkEqualStrings(b *testing.B) {
+	b.ReportAllocs()
+	b.ReportAllocs()
+	s := "Hello, test function!"
+	want := "Hello, test function!"
+
+	b.ResetTimer()
+	for range b.N {
+		_ = (s == want)
+	}
+}
+
+func BenchmarkEqualConstantTimeCmp(b *testing.B) {
+	b.ReportAllocs()
+	b.ReportAllocs()
+	s := "Hello, test function!"
+	want := "Hello, test function!"
+
+	b.ResetTimer()
+	for range b.N {
+		_ = subtle.ConstantTimeCompare([]byte(s), []byte(want))
 	}
 }
